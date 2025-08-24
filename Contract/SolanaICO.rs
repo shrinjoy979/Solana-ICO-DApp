@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount};
 
-declare_id!("PROGRAM_ID");
+declare_id!("GWPFLLuoLowCSkFNUAaWA2V563Zp5Pbwoby1A2NGgto5");
 
 #[error_code]
 pub enum ErrorCode{
@@ -13,7 +13,7 @@ pub enum ErrorCode{
 
 #[program]
 pub mod ico {
-    pub const ICO_MINT_ADDRESS: &str = "";
+    pub const ICO_MINT_ADDRESS: &str = "37WWcnieKccG5ZCav9wz1FhzVh6fsrnHJR2CZqi56nYy";
     pub const LAMPORTS_PER_TOKEN: u64 = 1_000_000; // 0.001 SOL
     pub const TOKEN_DECIMALS: u64 = 1_000_000_000; // 10^9 for SPL token decimals
 
@@ -36,7 +36,7 @@ pub mod ico {
             }
         );
 
-        token::Transfer(cpi_ctx, raw_amount)?;
+        token::transfer(cpi_ctx, raw_amount)?;
         msg!("Transfered {} ICO tokens to program ATA", ico_amount);
 
         // update our state variable
@@ -68,7 +68,7 @@ pub mod ico {
             }
         );
 
-        token::Transfer(cpi_ctx, raw_amount)?;
+        token::transfer(cpi_ctx, raw_amount)?;
 
         // update our state variable
         let data = &mut ctx.accounts.data;
