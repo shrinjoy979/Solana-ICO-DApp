@@ -257,10 +257,223 @@ export default function Home() {
       await fetchIcoData();
       await fetchUserTokenBalance();
     } catch (error) {
-      console.log("Error initializing ICO:", error);
+      console.log("Error Buying:", error);
       alert(`Error: ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
+
+  const fetchUserTokenBalance = async () => {
+    try {
+      if(!wallet.publicKey) return;
+
+      const userAta = await getAssociatedTokenAddress(
+        ICO_MINT,
+        wallet.publicKey
+      );
+
+      try {
+        const tokenAccount = await getAccount(connection, userAta);
+        setUserTokenBalance(tokenAccount.account.toString());
+      } catch (error) {
+        console.log(error);
+        setUserTokenBalance("0");
+      }
+    } catch (error) {
+      console.log("Error fetching token balance", error);
+      setUserTokenBalance("0");
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
+      <div className="relative py-3 sm:max-w-xl sm:mx-auto">
+        <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
+          <div className="max-w-md mx-auto">
+            <div className="pb-8">
+              <div className="flex justify-between items-center">
+                <h1 className="text-2xl font-bold">Solana ICO Dapp</h1>
+                <WalletMultiButton />
+              </div>
+
+              {wallet.connected && (
+                <div className="mt-4 text-sm text-gray-600">
+                  <p>
+                    Wallet: {wallet.publicKey.toString().slice(0,8)}...
+                    {wallet.publicKey.toString().slice(-8)}
+                  </p>
+                  <p className="mt-1">
+                    Status:
+                    <span className={`font-semibold ${isAdmin ? "text-green-600" : "text-blue-600"}`}>
+                      {isAdmin ? "Admin" : "User"}
+                    </span>
+                  </p>
+
+                  <p className="mt-2 p-2 bg-gray-50 rounded-lg">
+                    <span className="text-gray-600">
+                      Our Token Balance
+                    </span>
+                    <span className="font-semibold">
+                      {userTokenBalance ? (Number(userTokenBalance) / 1e9).toString() : "0"} tokens
+                    </span>
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {wallet.connected && (
+              <div className="py-8">
+                {icoData ? (
+                  <div className="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <h2 className="text-lg font-semibold mb-3">ICO Status</h2>
+
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <div className="text-gray-600">Total Supply</div>
+                        <p className="font-medium">
+                          {icoData.totalTokens.toString()}
+                          tokens
+                        </p>
+                      </div>
+                      <div>
+                        <div className="text-gray-600">Tokens Sold</div>
+                        <p className="font-medium">
+                          {icoData.tokensSold.toString()}
+                          tokens
+                        </p>
+                      </div>
+                      <div>
+                        <div className="text-gray-600">Tokens Price</div>
+                        <p className="font-medium">0.001 SOL</p>
+                      </div>
+                      <div>
+                        <div className="text-gray-600">Available</div>
+                        <p className="font-medium">
+                          {(icoData.totalTokens - icoData.tokensSold).toString()}
+                          tokens
+                        </p>
+                      </div>
+                      <div>
+                        <div className="text-gray-600">Your Balance</div>
+                        <p className="font-medium">
+                          {userTokenBalance ? (Number(userTokenBalance) / 1e9).toFixed(2) : "0"} tokens
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  isAdmin && (
+                    <div className="mb-8 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                      <p className="text-yellow-700">
+                        ICO needs to be initialized
+                      </p>
+                    </div>
+                  )
+                )}
+                
+                <div className="space-y-4">
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder={
+                      isAdmin ? icoData ? "Amount of tokens to deposite" : "Amount of tokens to initialized" : "Amount of tokens to buy"
+                    }
+                    className="w-full p-3 border-rounded-lg focus:right-2 focus:ring-blue-500 focus:border-l-blue-500"
+                    min="1"
+                    step="1"
+                  />
+
+                  {
+                    amount && !isAdmin && (
+                      <div className="p-4 bg-blue-50 rounded-lg border border-blue-100 space-y-2">
+                        <div className="flex justify-between">
+                          <span> Token Amount: </span>
+                          <span className="font-medium"> {amount} Tokens</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span> Cost: </span>
+                          <span className="font-medium">
+                            {(parseInt(amount) * 0.001).toFixed(3)} Tokens
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span> Network Fee: </span>
+                          <span className="font-medium">0.000005 SOL</span>
+                        </div>
+
+                        <div className="border-t pt-2 flex justify-between font-semibold">
+                          <span> Toal: </span>
+                          <span className="font-medium">{(parseInt(amount) * 0.001 + 0.000005).toFixed(6)} SOL</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {
+                      isAdmin ? (
+                        <div className="space-y-3">
+                          {
+                            !icoData && (
+                              <button 
+                                onClick={createIcoAta}
+                                disabled={loading}
+                                className="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+                              >
+                                {loading ? "Initializing..." : "Initialize ICO"}
+                              </button>
+                            )
+                          }
+
+                          {icoData && (
+                            <>
+                              <button 
+                                onClick={depositIco}
+                                disabled={loading}
+                                className="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+                              >
+                                {loading ? "Depositing..." : "Deposite Tokens"}
+                              </button>
+
+                              <button 
+                                onClick={buyTokens}
+                                disabled={loading}
+                                className="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+                              >
+                                {loading ? "Processing..." : "Buy Tokens"}
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <button 
+                          onClick={buyTokens}
+                          disabled={loading || !icoData}
+                          className="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+                        >
+                          {loading ? "Processing..." : "Buy Tokens"}
+                        </button>
+                      )}
+
+                      {loading && (
+                        <div className="text-center animate-pulse text-gray-600">
+                          Processing transaction...
+                        </div>
+                      )}
+                </div>
+              </div>
+            )}
+
+            {
+              !wallet.connected && (
+                <div className="py-8 text-center text-gray-600">
+                  Please connect your wallet to continue
+                </div>
+              )
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
