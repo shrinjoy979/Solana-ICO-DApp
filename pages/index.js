@@ -43,7 +43,7 @@ export default function Home() {
   }, [wallet.connected])
 
   const getProgram = () => {
-    if (wallet.connected) return null;
+    if (!wallet.connected) return null;
 
     const provider = new AnchorProvider(connection, wallet, {
       commitment: "confirmed",
@@ -55,9 +55,8 @@ export default function Home() {
     try {
       const program = getProgram();
       if (!program) return;
-
       const [dataPda] = await PublicKey.findProgramAddress(
-        [ArrayBuffer.form("data"), wallet.publicKey.toBuffer()],
+        [Buffer.from("data"), wallet.publicKey.toBuffer()],
         program.programId
       );
 
@@ -275,7 +274,7 @@ export default function Home() {
 
       try {
         const tokenAccount = await getAccount(connection, userAta);
-        setUserTokenBalance(tokenAccount.account.toString());
+        setUserTokenBalance(tokenAccount.amount.toString());
       } catch (error) {
         console.log(error);
         setUserTokenBalance("0");
@@ -304,7 +303,7 @@ export default function Home() {
                     {wallet.publicKey.toString().slice(-8)}
                   </p>
                   <p className="mt-1">
-                    Status:
+                    Status:&nbsp;
                     <span className={`font-semibold ${isAdmin ? "text-green-600" : "text-blue-600"}`}>
                       {isAdmin ? "Admin" : "User"}
                     </span>
@@ -312,7 +311,7 @@ export default function Home() {
 
                   <p className="mt-2 p-2 bg-gray-50 rounded-lg">
                     <span className="text-gray-600">
-                      Our Token Balance
+                      Our Token Balance&nbsp;
                     </span>
                     <span className="font-semibold">
                       {userTokenBalance ? (Number(userTokenBalance) / 1e9).toString() : "0"} tokens
