@@ -168,7 +168,7 @@ export default function Home() {
       );
 
       await program.methods
-      .deposiIcoInAta(new BN(amount))
+      .depositeIcoInAta(new BN(amount))
       .accounts({
         icoAtaForIcoProgram: icoAtaPda,
         data: dataPda,
@@ -274,6 +274,7 @@ export default function Home() {
 
       try {
         const tokenAccount = await getAccount(connection, userAta);
+        console.log('tokenAccount', tokenAccount);
         setUserTokenBalance(tokenAccount.amount.toString());
       } catch (error) {
         console.log(error);
@@ -292,7 +293,7 @@ export default function Home() {
           <div className="max-w-md mx-auto">
             <div className="pb-8">
               <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold">Solana ICO Dapp</h1>
+                <h1 className="text-2xl font-bold mr-2">Solana ICO Dapp</h1>
                 <WalletMultiButton />
               </div>
 
@@ -311,7 +312,7 @@ export default function Home() {
 
                   <p className="mt-2 p-2 bg-gray-50 rounded-lg">
                     <span className="text-gray-600">
-                      Our Token Balance&nbsp;
+                      Your Token Balance&nbsp;
                     </span>
                     <span className="font-semibold">
                       {userTokenBalance ? (Number(userTokenBalance) / 1e9).toString() : "0"} tokens
@@ -332,14 +333,14 @@ export default function Home() {
                         <div className="text-gray-600">Total Supply</div>
                         <p className="font-medium">
                           {icoData.totalTokens.toString()}
-                          tokens
+                          &nbsp;tokens
                         </p>
                       </div>
                       <div>
                         <div className="text-gray-600">Tokens Sold</div>
                         <p className="font-medium">
                           {icoData.tokensSold.toString()}
-                          tokens
+                          &nbsp;tokens
                         </p>
                       </div>
                       <div>
@@ -350,7 +351,7 @@ export default function Home() {
                         <div className="text-gray-600">Available</div>
                         <p className="font-medium">
                           {(icoData.totalTokens - icoData.tokensSold).toString()}
-                          tokens
+                          &nbsp;tokens
                         </p>
                       </div>
                       <div>
@@ -379,7 +380,7 @@ export default function Home() {
                     placeholder={
                       isAdmin ? icoData ? "Amount of tokens to deposite" : "Amount of tokens to initialized" : "Amount of tokens to buy"
                     }
-                    className="w-full p-3 border-rounded-lg focus:right-2 focus:ring-blue-500 focus:border-l-blue-500"
+                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     min="1"
                     step="1"
                   />
