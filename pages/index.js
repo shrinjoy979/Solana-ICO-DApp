@@ -274,7 +274,6 @@ export default function Home() {
 
       try {
         const tokenAccount = await getAccount(connection, userAta);
-        console.log('tokenAccount', tokenAccount);
         setUserTokenBalance(tokenAccount.amount.toString());
       } catch (error) {
         console.log(error);
