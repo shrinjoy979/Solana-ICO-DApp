@@ -13,7 +13,7 @@ pub enum ErrorCode{
 
 #[program]
 pub mod ico {
-    pub const ICO_MINT_ADDRESS: &str = "37WWcnieKccG5ZCav9wz1FhzVh6fsrnHJR2CZqi56nYy";
+    pub const ICO_MINT_ADDRESS: &str = "2E6QHEGFcAAkYs7AujCzKwHmGoetVQ7Ec4fHJdxHMrPR";
     pub const LAMPORTS_PER_TOKEN: u64 = 1_000_000; // 0.001 SOL
     pub const TOKEN_DECIMALS: u64 = 1_000_000_000; // 10^9 for SPL token decimals
 
